@@ -1,0 +1,3 @@
+/media/vinhpn/Data/MyProject/Linux/Tutorials/Linux/Device_Driver/LCD16x2/pix_mod.ko
+/media/vinhpn/Data/MyProject/Linux/Tutorials/Linux/Device_Driver/LCD16x2/pix_mod.o
+
