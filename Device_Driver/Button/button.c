@@ -3,36 +3,30 @@
 #include <linux/gpio.h>
 #include <asm/io.h>
 
-#define BUTTON 0
+#define BUTTON 19
 #define BASE_ADD_GPIO 0x3F200000
-#define OFFSET_GPIOA 0x00
-#define OFFSET_GPIOA_PULL 0x1C
-#define OFFSET_EXTERNAL_INTERRUPT_GPIO13 0x200
-#define SIZE_EXTERNAL_INTERRUPT_GPIO 0x20
-#define SIZE_GPIOA_PULL 0x08
 #define SIZE_GPIO 0xA4
 
 unsigned char irq_eint0;
-unsigned int *gpioa_0_7;
-unsigned int *ex_gpioa_0_7;
-unsigned int *gpioa_pull_0_15;
+unsigned int *gpio_base;
 
 irqreturn_t external_interrupt_handler(int irq, void *dev_id, struct pt_regs *regs)
 {
 
-	if((gpioa_0_7[4] & (1 << 0)) == 0)
-	{
-		if((gpioa_0_7[4] & (1 << 1)) == 0)
-		{
-			gpioa_0_7[4] |= (1 << 1);
-			printk("led_on\n");
-		}
-		else
-		{
-			gpioa_0_7[4] &= ~(1 << 1);
-			printk("led_off\n");
-		}
-	}
+	// if((gpioa_0_7[4] & (1 << 0)) == 0)
+	// {
+	// 	if((gpioa_0_7[4] & (1 << 1)) == 0)
+	// 	{
+	// 		gpioa_0_7[4] |= (1 << 1);
+	// 		printk("led_on\n");
+	// 	}
+	// 	else
+	// 	{
+	// 		gpioa_0_7[4] &= ~(1 << 1);
+	// 		printk("led_off\n");
+	// 	}
+	// }
+	printk("vinhpn interrupt\n");
 	return IRQ_HANDLED;
 
 }
@@ -49,36 +43,18 @@ static int __init external_interrupt_init(void)
 		return -1;
 	}
 
-	//Select EINT0 mode GPIO19
+	//Select input mode GPIO19
 	gpio_base[1] &= ~(7 << 19);
-	// gpio_base[0] |= (6 << 0);
 
 	//Select output mode GPIO13
 	gpio_base[1] &= ~(7 << 9);
 	gpio_base[1] |= (1 << 9);
 
-	//Mapping EINT_GPIOA
-	ex_gpioa_0_7 = ioremap(BASE_ADD_GPIO + OFFSET_EXTERNAL_INTERRUPT_GPIOA, SIZE_EXTERNAL_INTERRUPT_GPIOA);
-	if(ex_gpioa_0_7 == NULL)
-	{
-		printk("Mapping ex_gpioa fail\n");
-		return -1;
-	}
+	//GPIO19 Falling Edge
+	gpio_base[22] |= (1 << 19);
 
-	//EINT0 Negative Edge
-	ex_gpioa_0_7[0] &= ~(15 << 0);
-	ex_gpioa_0_7[0] |= (1 << 0);
-
-	//Mapping gpioa pull
-	gpioa_pull_0_15 = ioremap(BASE_ADD_GPIO + OFFSET_GPIOA_PULL, SIZE_GPIOA_PULL);
-	if(gpioa_pull_0_15 == NULL)
-	{
-		printk("Mapping gpioa pull fail!\n");
-		return -1;
-	}
-	//GPIOA0 PULL UP
-	gpioa_pull_0_15[0] &= ~(3 << 0);
-	gpioa_pull_0_15[0] |= (1 << 0);
+	//Clear pending GPIO19 bit 
+	gpio_base[16] |= (1 << 19);
 
 	//Init interrupt.
 	irq_eint0 = gpio_to_irq(BUTTON);
@@ -91,9 +67,7 @@ static int __init external_interrupt_init(void)
 static void __exit external_interrupt_exit(void)
 {
 	printk("END!\n");
-	iounmap(gpioa_0_7);
-	iounmap(ex_gpioa_0_7);
-	iounmap(gpioa_pull_0_15);
+	iounmap(gpio_base);
 	free_irq(irq_eint0, (void *)external_interrupt_handler);
 }
 
