@@ -1,6 +1,8 @@
 #ifndef _GTP_H_
 #define _GTP_H_
 
+#include "dltg_main.h"
+
 /* General GTP protocol related definitions. */
 #define GTPU_PORT	2152
 #define GTP_TPDU	255

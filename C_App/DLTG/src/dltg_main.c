@@ -63,13 +63,13 @@ int main(int argc, char *argv[])
 
 
 
-	int sockfd; 
-    char buffer[MAXLINE]; 
-    char *hello = "Hello from client"; 
-    struct sockaddr_in     servaddr; 
+	// int sockfd; 
+    // char buffer[MAXLINE]; 
+    // char *hello = "Hello from client"; 
+    // struct sockaddr_in     servaddr; 
   
-    // Creating socket file descriptor 
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("socket creation failed"); 
-        exit(EXIT_FAILURE); 
-    } 
+    // // Creating socket file descriptor 
+    // if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+    //     perror("socket creation failed"); 
+    //     exit(EXIT_FAILURE); 
+    // } 
